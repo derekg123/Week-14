@@ -7,10 +7,7 @@ import datetime
 import calendar
 
 token = "EAAIvnpZBTjA0BAAweMSaC1JuvB1tHGOHJ55iwkWzLbru28dQwuKpr2AuQYQG82JcNIiuZCozPEZBYus8A9ZA1UZBPQgZCCaU5ScpZCwA3ilbDnxHX7cUSPT7E4HZBCIDODZBKVcY0GUmQuUI2AQjO81EXP3CQlAd0owARSXGZBooF4DAZDZD"
-req = "me?fields=posts.limit(100)"
-
-#results = fb_requests(request).json()
-#print(results)
+#req = "me?fields=posts.limit(100)"
 
 CACHE_FNAME = "Facebook_cache.json"
 
@@ -50,7 +47,7 @@ except:
 
 
 def get_fb_posts():
-    req = "me?fields=posts.limit(190)"
+    req = "me?fields=posts.limit(190)"      ##Results in 100 interactions
     if 'Posts' in CACHE_DICTION:
         return CACHE_DICTION['Posts']
     else:
@@ -68,7 +65,7 @@ def get_fb_posts():
 
 plswork = get_fb_posts()
 
-def dayNameFromWeekday(weekday):
+def intDaytoDofW(weekday):
     if weekday == 0:
         return "Monday"
     if weekday == 1:
@@ -94,23 +91,23 @@ def dayNameFromWeekday(weekday):
 #            dayname = dayNameFromWeekday(answer)
 #            return dayname
 
-def turn_into_daynames1(date):
+def turn_into_daynames(date):
     calendar = date["created_time"]
     datesinlst = re.findall('(^2.+)T', calendar)
     for x in datesinlst:
         year, month, day = (int(y) for y in x.split('-'))
         answer = datetime.date(year, month, day).weekday()
-        dayname = dayNameFromWeekday(answer)
+        dayname = intDaytoDofW(answer)
         return dayname
 
 
-#conn = sqlite3.connect('Facebook_DB.sqlite')
-#cur = conn.cursor()
+conn = sqlite3.connect('Facebook_DB.sqlite')
+cur = conn.cursor()
 
-#cur.execute('DROP TABLE IF EXISTS Posts')
-#cur.execute("CREATE TABLE IF NOT EXISTS Posts ('message_id' TEXT, 'day_of_week' TEXT)")
+cur.execute('DROP TABLE IF EXISTS Posts')
+cur.execute("CREATE TABLE IF NOT EXISTS Posts ('message_id' TEXT, 'day_of_week' TEXT)")
 
-#for prop in plswork["posts"]["data"]:
-#    try:
-#        cur.execute('INSERT INTO Posts (message_id) VALUES (?)' (prop["id"]))
-#        cur.execute('INSERT INTO Posts (day_of_week) VALUES (?)' )
+for prop in plswork["posts"]["data"]:
+    fb_info = (prop["id"], turn_into_daynames(prop))
+    cur.execute('INSERT INTO Posts (message_id, day_of_week) VALUES (?,?)', fb_info)
+conn.commit()
