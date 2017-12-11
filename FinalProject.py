@@ -2,6 +2,9 @@ import requests
 import facebook
 import json
 import sqlite3
+import re
+import datetime
+import calendar
 
 token = "EAAIvnpZBTjA0BAAweMSaC1JuvB1tHGOHJ55iwkWzLbru28dQwuKpr2AuQYQG82JcNIiuZCozPEZBYus8A9ZA1UZBPQgZCCaU5ScpZCwA3ilbDnxHX7cUSPT7E4HZBCIDODZBKVcY0GUmQuUI2AQjO81EXP3CQlAd0owARSXGZBooF4DAZDZD"
 req = "me?fields=posts.limit(100)"
@@ -65,6 +68,49 @@ def get_fb_posts():
 
 plswork = get_fb_posts()
 
-for date in plswork["posts"]["data"]:
+def dayNameFromWeekday(weekday):
+    if weekday == 0:
+        return "Monday"
+    if weekday == 1:
+        return "Tuesday"
+    if weekday == 2:
+        return "Wednesday"
+    if weekday == 3:
+        return "Thursday"
+    if weekday == 4:
+        return "Friday"
+    if weekday == 5:
+        return "Saturday"
+    if weekday == 6:
+        return "Sunday"
+
+#def turn_into_daynames():
+#    for date in plswork["posts"]["data"]:
+#        calendar = date["created_time"]
+#        datesinlst = re.findall('(^2.+)T', calendar)
+#        for x in datesinlst:
+#            year, month, day = (int(y) for y in x.split('-'))
+#            answer = datetime.date(year, month, day).weekday()
+#            dayname = dayNameFromWeekday(answer)
+#            return dayname
+
+def turn_into_daynames1(date):
     calendar = date["created_time"]
-    calonly = 
+    datesinlst = re.findall('(^2.+)T', calendar)
+    for x in datesinlst:
+        year, month, day = (int(y) for y in x.split('-'))
+        answer = datetime.date(year, month, day).weekday()
+        dayname = dayNameFromWeekday(answer)
+        return dayname
+
+
+#conn = sqlite3.connect('Facebook_DB.sqlite')
+#cur = conn.cursor()
+
+#cur.execute('DROP TABLE IF EXISTS Posts')
+#cur.execute("CREATE TABLE IF NOT EXISTS Posts ('message_id' TEXT, 'day_of_week' TEXT)")
+
+#for prop in plswork["posts"]["data"]:
+#    try:
+#        cur.execute('INSERT INTO Posts (message_id) VALUES (?)' (prop["id"]))
+#        cur.execute('INSERT INTO Posts (day_of_week) VALUES (?)' )
